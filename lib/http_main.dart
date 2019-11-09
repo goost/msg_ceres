@@ -17,15 +17,7 @@ class MyGetHttpData extends StatefulWidget {
 
 // Create the state for our stateful widget
 class MyGetHttpDataState extends State<MyGetHttpData> {
-  //final String url =
-  //    "http://msg-lunchserver6.westeurope.azurecontainer.io:8080/users";
-  final String url = "http://localhost:8080/users";
-  /*{
-  "firstName": "Hans",
-  "lastName": "Müller",
-  "userName": "mueller"
-}
-*/
+  final String url = "https://swapi.co/api/people";
   List data;
 
   // Function to get the JSON data
@@ -44,7 +36,7 @@ class MyGetHttpDataState extends State<MyGetHttpData> {
       // Get the JSON data
       var dataConvertedToJSON = json.decode(response.body);
       // Extract the required part and assign it to the global variable named data
-      data = dataConvertedToJSON;
+      data = dataConvertedToJSON['results'];
     });
 
     return "Successfull";
@@ -70,8 +62,8 @@ class MyGetHttpDataState extends State<MyGetHttpData> {
                     child: Container(
                       child: Text(
                         // Read the name field value and set it in the Text widget
-                        //data[index]['name'],
                         '${data[index]['name']} height is ${data[index]['height']}',
+                        //data[index]['name'],
                         // set some style to text
                         style: TextStyle(
                             fontSize: 20.0, color: Colors.lightBlueAccent),
