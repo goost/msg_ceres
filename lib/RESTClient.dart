@@ -15,6 +15,19 @@ dynamic _parseJSON(String body) {
   return responseConvertedToJson;
 }
 
+Future<bool> createChoice(int groupId, int electionId, String newChoiceName,
+    String newChoiceDescription) async {
+  var url = '$domain/groups/${groupId}/lunchLocations';
+  var response = await http.post(Uri.encodeFull(url),
+      headers: {"Content-Type": "application/json"},
+      body:
+          '{"name": "$newChoiceName", "description": "$newChoiceDescription"}');
+  //var jsonResponse = _parseJSON(response.body);
+  print('("------createChoice:${response.statusCode}\n${response.body}');
+  //var newChoiceId = jsonResponse['id'];
+  return Future.value(response.statusCode == 200);
+}
+
 Future<bool> voteForChoice(
     int userId, int groupId, int electionId, int choiceId) async {
   var url =

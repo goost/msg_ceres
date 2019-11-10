@@ -15,6 +15,8 @@ class ChoicesData extends StatefulWidget {
 class Choices extends State<ChoicesData> {
   String groupName;
   List<Choice> choices;
+  String newChoiceName = '';
+  String newChoiceDescription = '';
 
   _onVotePressed(int choiceId) {
     return () {
@@ -32,9 +34,11 @@ class Choices extends State<ChoicesData> {
       child: Center(
           child: Column(
         // Stretch the cards in horizontal axis
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Card(
+            // margin: EdgeInsets.symmetric(vertical: 5),
+
             child: Padding(
               padding: const EdgeInsets.all(50.0),
               child: Column(
@@ -44,20 +48,20 @@ class Choices extends State<ChoicesData> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(choices[index].name,
-                          style: localTheme.textTheme.display1),
+                          style: localTheme.textTheme.subhead.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple)),
                       Row(
                         children: <Widget>[
                           Text('${choices[index].numberOfVotes}',
-                              style: localTheme.textTheme.title
-                                  .copyWith(fontSize: 42)),
+                              style: localTheme.textTheme.title),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                           ),
                           RaisedButton(
                             child: Text(
                               "Vote",
-                              style: localTheme.textTheme.button
-                                  .copyWith(fontSize: 42),
+                              style: localTheme.textTheme.button,
                             ),
                             onPressed: _onVotePressed(choices[index].id),
                           )
@@ -94,6 +98,67 @@ class Choices extends State<ChoicesData> {
           _loadItAll();
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) => _addChoiceDialogBuilder(context));
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.tealAccent,
+      ),
+    );
+  }
+
+  Widget _addChoiceDialogBuilder(BuildContext context) {
+    return SimpleDialog(
+      children: <Widget>[
+        Column(
+          children: <Widget>[
+            Text(
+              "Add new choice",
+              style: Theme.of(context).textTheme.title,
+            ),
+            Padding(
+              padding: EdgeInsets.all(5),
+            ),
+            TextField(
+                onChanged: (v) => newChoiceName = v,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), labelText: 'Name')),
+            Padding(
+              padding: EdgeInsets.all(5),
+            ),
+            TextField(
+                onChanged: (v) => newChoiceDescription = v,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), labelText: 'Description')),
+            Wrap(
+              children: <Widget>[
+                FlatButton(
+                  child: Text("Cancel"),
+                  onPressed: () {
+                    newChoiceDescription = "";
+                    newChoiceName = "";
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
+                  child: Text("Submit"),
+                  onPressed: () {
+                    createChoice(
+                            1, 1, this.newChoiceName, this.newChoiceDescription)
+                        .whenComplete(() {
+                      _loadItAll();
+                      Navigator.of(context).pop();
+                    });
+                  },
+                )
+              ],
+            )
+          ],
+        )
+      ],
     );
   }
 
