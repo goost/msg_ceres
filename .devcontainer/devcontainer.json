@@ -13,7 +13,8 @@
         //  "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"
         "--cap-add=SYS_ADMIN",
         "--privileged",
-        "-v type=bind,source=/dev/bus/usb,target=/dev/bus/usb"
+        "-v type=bind,source=/dev/bus/usb,target=/dev/bus/usb",
+        "-v type=bind,source=/etc/udev/rules.d,target=/etc/udev/rules.d"
     ],
     // Use 'settings' to set *default* container specific settings.json values on container create. 
     // You can edit these settings after create using File > Preferences > Settings > Remote.

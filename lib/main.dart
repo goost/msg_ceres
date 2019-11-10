@@ -2,53 +2,23 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'RESTClient.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: MyGetHttpData(),
+    home: ChoicesData(),
   ));
 }
 
 // Create a stateful widget
-class MyGetHttpData extends StatefulWidget {
+class ChoicesData extends StatefulWidget {
   @override
-  MyGetHttpDataState createState() => MyGetHttpDataState();
+  Choices createState() => Choices();
 }
 
 // Create the state for our stateful widget
-class MyGetHttpDataState extends State<MyGetHttpData> {
-  //final String url =
-  //    "http://msg-lunchserver6.westeurope.azurecontainer.io:8080/users";
-  final String url = "http://localhost:8080/users";
-  /*{
-  "firstName": "Hans",
-  "lastName": "Müller",
-  "userName": "mueller"
-}
-*/
+class Choices extends State<ChoicesData> {
   List data;
-
-  // Function to get the JSON data
-  Future<String> getJSONData() async {
-    var response = await http.get(
-        // Encode the url
-        Uri.encodeFull(url),
-        // Only accept JSON response
-        headers: {"Accept": "application/json"});
-
-    // Logs the response body to the console
-    print(response.body);
-
-    // To modify the state of the app, use this method
-    setState(() {
-      // Get the JSON data
-      var dataConvertedToJSON = json.decode(response.body);
-      // Extract the required part and assign it to the global variable named data
-      data = dataConvertedToJSON;
-    });
-
-    return "Successfull";
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +41,7 @@ class MyGetHttpDataState extends State<MyGetHttpData> {
                       child: Text(
                         // Read the name field value and set it in the Text widget
                         //data[index]['name'],
-                        '${data[index]['name']} height is ${data[index]['height']}',
+                        '${data[index]['firstName']} username is ${data[index]['userName']}',
                         // set some style to text
                         style: TextStyle(
                             fontSize: 20.0, color: Colors.lightBlueAccent),
@@ -91,7 +61,10 @@ class MyGetHttpDataState extends State<MyGetHttpData> {
   void initState() {
     super.initState();
 
-    // Call the getJSONData() method when the app initializes
-    this.getJSONData();
+    getAllUsers().then((jsonUsers) {
+      this.setState(() {
+        data = jsonUsers;
+      });
+    });
   }
 }
