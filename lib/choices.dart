@@ -81,14 +81,20 @@ class Choices extends State<ChoicesData> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          //TODO (glost) Read groupname
-          title: Text(groupName ?? "Choose your poison"),
-        ),
-        // Create a Listview and load the data when available
-        body: ListView.builder(
+      appBar: AppBar(
+        //TODO (glost) Read groupname
+        title: Text(groupName ?? "Choose your poison"),
+      ),
+      // Create a Listview and load the data when available
+      body: RefreshIndicator(
+        child: ListView.builder(
             itemCount: choices == null ? 0 : choices.length,
-            itemBuilder: _listBuild));
+            itemBuilder: _listBuild),
+        onRefresh: () async {
+          _loadItAll();
+        },
+      ),
+    );
   }
 
   @override
