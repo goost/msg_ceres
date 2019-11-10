@@ -6,23 +6,31 @@ import 'PODO.dart';
 import 'RESTClient.dart';
 
 // Create a stateful widget
-class ChoicesData extends StatefulWidget {
+class ChoicesScreen extends StatefulWidget {
   @override
-  Choices createState() => Choices();
+  ChoicesData createState() => ChoicesData();
 }
 
 // Create the state for our stateful widget
-class Choices extends State<ChoicesData> {
+class ChoicesData extends State<ChoicesScreen> {
+  static const GroupId = 1;
+  Election currentElection;
   String groupName;
   List<Choice> choices;
   String newChoiceName = '';
   String newChoiceDescription = '';
+  String userName = 'default';
+  User currentUser =
+      User(firstName: "unset", lastName: "unset", userName: "unset");
 
   _onVotePressed(int choiceId) {
     return () {
-      deleteVoteforChoice(1, 1, 1)
-          .whenComplete(() => voteForChoice(1, 1, 1, choiceId).then((vote) {
-                print('-----Pressed and: $vote');
+      deleteVoteforChoice(
+              currentUser.id, ChoicesData.GroupId, currentElection.id)
+          .whenComplete(() => voteForChoice(currentUser.id, ChoicesData.GroupId,
+                      currentElection.id, choiceId)
+                  .then((vote) {
+                print('-----Pressed $choiceId and: $vote');
                 _loadItAll();
               }));
     };
@@ -84,10 +92,13 @@ class Choices extends State<ChoicesData> {
 
   @override
   Widget build(BuildContext context) {
+    final String user = ModalRoute.of(context).settings.arguments;
+    print("-----Got username: $user");
+    this.userName = user.isEmpty ? "default" : user;
     return Scaffold(
       appBar: AppBar(
         //TODO (glost) Read groupname
-        title: Text(groupName ?? "Choose your poison"),
+        title: Text(groupName ?? "${currentUser.userName}, choose your poison"),
       ),
       // Create a Listview and load the data when available
       body: RefreshIndicator(
@@ -122,6 +133,7 @@ class Choices extends State<ChoicesData> {
             Padding(
               padding: EdgeInsets.all(5),
             ),
+            //TODO (glost): TextFieldBuilder is not disposed
             TextField(
                 onChanged: (v) => newChoiceName = v,
                 decoration: InputDecoration(
@@ -165,15 +177,36 @@ class Choices extends State<ChoicesData> {
   @override
   void initState() {
     super.initState();
-    _loadItAll();
+    Future.delayed(Duration(microseconds: 250)).whenComplete(() async {
+      print('Using username ${this.userName}');
+      await createUser(this.userName);
+      var users = await getAllUsers();
+      this.currentUser =
+          users.singleWhere((it) => it.userName == this.userName);
+      await addUserToGroup(this.currentUser.id, ChoicesData.GroupId);
+      _loadItAll();
+    });
   }
 
-  void _loadItAll() {
-    //TODO (glost): Hardcoded values, hardcoded pain
-    getAllChoicesForElectionWithVotes(1, 1).then((choices) {
-      this.setState(() {
-        this.choices = choices;
-      });
+  void _loadItAll() async {
+    print('Using username ${this.userName}');
+    await createUser(this.userName);
+    var users = await getAllUsers();
+    this.currentUser = users.singleWhere((it) => it.userName == this.userName);
+
+    var elections = await getAllElectionsForGroup(ChoicesData.GroupId);
+    print('Elections before Sort');
+    elections.forEach((it) => print(it.id));
+    //Descending
+    elections.sort((l, r) => r.id.compareTo(l.id));
+    print('Elections after Sort');
+    elections.forEach((it) => print(it.id));
+
+    this.currentElection = elections[0];
+    var choices = await getAllChoicesForElectionWithVotes(
+        ChoicesData.GroupId, this.currentElection.id);
+    setState(() {
+      this.choices = choices;
     });
   }
 }

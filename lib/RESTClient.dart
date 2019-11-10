@@ -3,7 +3,7 @@
  */
 
 import 'dart:async';
-import 'package:MSG/PODO.dart';
+import 'PODO.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -13,6 +13,41 @@ const String domain =
 dynamic _parseJSON(String body) {
   var responseConvertedToJson = json.decode(body);
   return responseConvertedToJson;
+}
+
+Future<bool> addUserToGroup(int userId, int groupId) async {
+  var url = '$domain/groups/${groupId}/members/${userId}';
+  var response = await http.post(
+    Uri.encodeFull(url),
+    headers: {"Content-Type": "application/json"},
+  );
+  print('("------addUserToGroup:${response.statusCode}\n${response.body}');
+  return Future.value(response.statusCode == 200);
+}
+
+Future<bool> createUser(String userName) async {
+  var url = '$domain/users';
+  var response = await http.post(Uri.encodeFull(url),
+      headers: {"Content-Type": "application/json"},
+      body:
+          '{"userName": "$userName", "firstName": "notset", "lastName" : "notset"}');
+
+  print('("------createUser:${response.statusCode}\n${response.body}');
+  return Future.value(response.statusCode == 200);
+}
+
+Future<List<Election>> getAllElectionsForGroup(int groupId) async {
+  var url = '$domain/groups/$groupId/elections';
+  var response = await http.get(
+      // Encode the url
+      Uri.encodeFull(url),
+      // Only accept JSON response
+      headers: {"Accept": "application/json"});
+
+  print(
+      '("------getAllElectionsForGroup:${response.statusCode}\n${response.body}');
+  var rawJson = _parseJSON(response.body) as List;
+  return rawJson.map((i) => Election.fromJson(i)).toList();
 }
 
 Future<bool> createChoice(int groupId, int electionId, String newChoiceName,
