@@ -15,6 +15,25 @@ dynamic _parseJSON(String body) {
   return responseConvertedToJson;
 }
 
+Future<bool> voteForChoice(
+    int userId, int groupId, int electionId, int choiceId) async {
+  var url =
+      '$domain/groups/${groupId}/elections/${electionId}/votes/${userId}/${choiceId}';
+  var response = await http.post(
+    Uri.encodeFull(url),
+  );
+  print('("------voteForChoice:${response.statusCode}\n${response.body}');
+  return Future.value(response.statusCode == 200);
+}
+
+Future<bool> deleteVoteforChoice(
+    int userId, int groupId, int electionId) async {
+  var url = '$domain/groups/${groupId}/elections/${electionId}/votes/${userId}';
+  var response = await http.delete(Uri.encodeFull(url));
+  print('("------DeleteVoteforChoice:${response.statusCode}\n${response.body}');
+  return Future.value(response.statusCode == 200);
+}
+
 Future<List<Choice>> getAllChoicesForElectionWithVotes(
     int groupId, int electionId) async {
   var votesF = getAllVotesForElection(groupId, electionId);
@@ -44,7 +63,8 @@ Future<List<Vote>> getAllVotesForElection(int groupId, int electionId) async {
       headers: {"Accept": "application/json"});
 
   // Logs the response body to the console
-  print("------gGtAllVotesForElection:\n${response.body}");
+  print(
+      "------GetAllVotesForElection:${response.statusCode}\n${response.body}");
 
   var rawJson = _parseJSON(response.body) as List;
   return rawJson.map((i) => Vote.fromJson(i)).toList();
@@ -60,7 +80,8 @@ Future<List<Choice>> getChoicesForElectionInGroup(
       headers: {"Accept": "application/json"});
 
   // Logs the response body to the console
-  print("------GetChoicesForElectionInGroup:\n${response.body}");
+  print(
+      "------GetChoicesForElectionInGroup:${response.statusCode}\n${response.body}");
 
   var rawJson = _parseJSON(response.body) as List;
   return rawJson.map((i) => Choice.fromJson(i)).toList();
@@ -75,7 +96,7 @@ Future<List<User>> getAllUsers() async {
       headers: {"Accept": "application/json"});
 
   // Logs the response body to the console
-  print("------GetAllUsers:\n${response.body}");
+  print("------GetAllUsers:${response.statusCode}\n${response.body}");
 
   var rawJson = _parseJSON(response.body) as List;
   return rawJson.map((i) => User.fromJson(i)).toList();

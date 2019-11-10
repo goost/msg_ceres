@@ -7,7 +7,10 @@ import 'choices.dart';
 
 void main() {
   runApp(MaterialApp(
-    theme: ThemeData(primarySwatch: Colors.teal),
+    theme: ThemeData(
+        primarySwatch: Colors.teal,
+        buttonColor: Colors.amber,
+        buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary)),
     home: ChoicesData(),
   ));
 }

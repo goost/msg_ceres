@@ -16,6 +16,16 @@ class Choices extends State<ChoicesData> {
   String groupName;
   List<Choice> choices;
 
+  _onVotePressed(int choiceId) {
+    return () {
+      deleteVoteforChoice(1, 1, 1)
+          .whenComplete(() => voteForChoice(1, 1, 1, choiceId).then((vote) {
+                print('-----Pressed and: $vote');
+                _loadItAll();
+              }));
+    };
+  }
+
   Widget _listBuild(BuildContext context, int index) {
     var localTheme = Theme.of(context);
     return Container(
@@ -35,9 +45,24 @@ class Choices extends State<ChoicesData> {
                     children: [
                       Text(choices[index].name,
                           style: localTheme.textTheme.display1),
-                      Text('${choices[index].numberOfVotes}',
-                          style:
-                              localTheme.textTheme.title.copyWith(fontSize: 42))
+                      Row(
+                        children: <Widget>[
+                          Text('${choices[index].numberOfVotes}',
+                              style: localTheme.textTheme.title
+                                  .copyWith(fontSize: 42)),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                          ),
+                          RaisedButton(
+                            child: Text(
+                              "Vote",
+                              style: localTheme.textTheme.button
+                                  .copyWith(fontSize: 42),
+                            ),
+                            onPressed: _onVotePressed(choices[index].id),
+                          )
+                        ],
+                      )
                     ],
                   ),
                   Text(choices[index].description,
@@ -69,8 +94,11 @@ class Choices extends State<ChoicesData> {
   @override
   void initState() {
     super.initState();
+    _loadItAll();
+  }
 
-//TODO (glost): Hardcoded values, hardcoded pain
+  void _loadItAll() {
+    //TODO (glost): Hardcoded values, hardcoded pain
     getAllChoicesForElectionWithVotes(1, 1).then((choices) {
       this.setState(() {
         this.choices = choices;
