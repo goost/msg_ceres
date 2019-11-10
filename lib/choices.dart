@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'PODO.dart';
 import 'RESTClient.dart';
 
 // Create a stateful widget
@@ -13,7 +14,7 @@ class ChoicesData extends StatefulWidget {
 // Create the state for our stateful widget
 class Choices extends State<ChoicesData> {
   String groupName;
-  List data;
+  List<Choice> choices;
 
   Widget _listBuild(BuildContext context, int index) {
     var localTheme = Theme.of(context);
@@ -25,15 +26,23 @@ class Choices extends State<ChoicesData> {
         children: <Widget>[
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(50.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(data[index]['name'],
-                      style: localTheme.textTheme.display1),
-                  Text(data[index]['description'],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(choices[index].name,
+                          style: localTheme.textTheme.display1),
+                      Text('${choices[index].numberOfVotes}',
+                          style:
+                              localTheme.textTheme.title.copyWith(fontSize: 42))
+                    ],
+                  ),
+                  Text(choices[index].description,
                       style: localTheme.textTheme.subhead
-                          .copyWith(fontStyle: FontStyle.italic))
+                          .copyWith(fontStyle: FontStyle.italic)),
                 ],
                 // added padding
               ),
@@ -53,7 +62,7 @@ class Choices extends State<ChoicesData> {
         ),
         // Create a Listview and load the data when available
         body: ListView.builder(
-            itemCount: data == null ? 0 : data.length,
+            itemCount: choices == null ? 0 : choices.length,
             itemBuilder: _listBuild));
   }
 
@@ -61,9 +70,10 @@ class Choices extends State<ChoicesData> {
   void initState() {
     super.initState();
 
-    getChoicesForElectionInGroup(1, 1).then((jsonChoices) {
+//TODO (glost): Hardcoded values, hardcoded pain
+    getAllChoicesForElectionWithVotes(1, 1).then((choices) {
       this.setState(() {
-        data = jsonChoices;
+        this.choices = choices;
       });
     });
   }
